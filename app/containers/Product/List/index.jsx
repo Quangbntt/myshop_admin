@@ -8,26 +8,18 @@ import {
   Button,
   Input,
   Divider,
-  Tag,
   Tooltip,
-  Switch,
+  Tag,
   Rate,
 } from "antd";
 import styled from "styled-components";
 import classNames from "classnames";
 import { array } from "prop-types";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  CloseOutlined,
-  CheckOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import { DownOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import Cell from "./Cell/index";
 import moment from "moment";
 import _ from "lodash";
 import * as style from "components/Variables";
-import ServiceBase from "utils/ServiceBase";
-import { Ui } from "utils/Ui";
 const { Column, ColumnGroup } = Table;
 const arr = [];
 
@@ -42,59 +34,64 @@ const List = memo(
     arrKey,
     show,
     setShow,
-    setVisible,
     visible,
+    setVisible,
+    visibleChild,
+    setVisibleChild,
   }) => {
-    // const dataMonth = params.thang
-    //   ? moment(params.thang, "YYYY-MM").daysInMonth()
-    //   : "";
-    // const dayOfMonth = params.thang.format("D");
     const onEdit = (row) => {
       // setRow(row);
       setVisible((preState) => {
         let nextState = { ...preState };
         nextState.isShow = true;
-        nextState.create = false;
+        nextState.type = "edit";
         nextState.data = row;
         return nextState;
       });
     };
-    const onStatus = async (e) => {
-      let userId = row.id;
-      let maCa = row.maCa;
-      let trangThai = row.trangThai;
-
-      let text = trangThai == true ? "Không hoạt động" : "Đang hoạt động";
+    const onDelete = (row) => {
+      confirm({
+        title: "Thông báo",
+        icon: <ExclamationCircleOutlined />,
+        content: "Bạn có muốn xóa thương hiệu này không?",
+        okText: "Đồng ý",
+        cancelText: "Hủy",
+        onOk() {
+          onDelteApi(row);
+        },
+        onCancel() {},
+      });
+    };
+    const onDelteApi = async (row) => {
+      setLoading(true);
       let result = await ServiceBase.requestJson({
-        url: `/catruc/trangthaica/${userId}`,
-        method: "GET",
-        data: {},
+        url: `/branch/delete`,
+        method: "POST",
+        data: { branches_id: row.id },
       });
       if (result.hasErrors) {
         Ui.showErrors(result.errors);
       } else {
-        confirm({
-          title: `Cập nhật trạng thái ${maCa} ${text}`,
-          icon: <ExclamationCircleOutlined />,
-          content: "Some descriptions",
-          onOk() {
-            setStatus(e);
-          },
-          onCancel() {},
+        Ui.showSuccess({ message: _.get(result, "value.message") });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
+          return nextState;
         });
       }
     };
-    const [status, setStatus] = useState(row.status);
     const columns = [
       {
         title: "STT",
         dataIndex: "key",
         key: "key",
+        width: 70,
       },
       {
         title: "Tên sản phẩm",
         dataIndex: "product_name",
         key: "product_name",
+        width: 120,
       },
       {
         title: "Ảnh",
@@ -121,16 +118,16 @@ const List = memo(
         title: "Chất liệu",
         key: "product_material",
         dataIndex: "product_material",
+        width: 100,
       },
       {
         title: "Giá bán",
         dataIndex: "product_price",
         key: "product_price",
+        width: 100,
         render: (value, row, index) => {
           const obj = {
-            children: (
-              value.toLocaleString()
-            ),
+            children: value.toLocaleString(),
             props: {},
           };
           return obj;
@@ -140,45 +137,23 @@ const List = memo(
         title: "Giá gốc",
         dataIndex: "product_promotion",
         key: "product_promotion",
+        width: 100,
         render: (value, row, index) => {
           const obj = {
-            children: (
-              value.toLocaleString()
-            ),
+            children: value.toLocaleString(),
             props: {},
           };
           return obj;
         },
       },
       {
-        title: "Số lượng",
-        dataIndex: "product_count",
-        key: "product_count",
-      },
-      {
-        title: "Màu sắc",
-        dataIndex: "color",
-        key: "color",
-      },
-      {
-        title: "Kích cỡ",
-        dataIndex: "size_name",
-        key: "size_name",
-      },
-      {
         title: "Đánh giá",
         dataIndex: "product_rate",
         key: "product_rate",
-        width: 180,
+        width: 170,
         render: (value, row, index) => {
           const obj = {
-            children: (
-              <Rate
-                allowHalf
-                defaultValue={value}
-                disabled={true}
-              />
-            ),
+            children: <Rate allowHalf defaultValue={value} disabled={true} />,
             props: {},
           };
           return obj;
@@ -188,6 +163,7 @@ const List = memo(
         title: "Trạng thái",
         dataIndex: "product_status",
         key: "product_status",
+        width: 75,
         render: (value, row, index) => {
           let color = value === 1 ? "green" : "red";
           let text = value === 1 ? "Còn hàng" : "Hết hàng";
@@ -206,11 +182,13 @@ const List = memo(
         title: "Lượt xem",
         dataIndex: "product_viewcount",
         key: "product_viewcount",
+        width: 100,
       },
       {
         title: "Giới tính",
         dataIndex: "sex",
         key: "sex",
+        width: 100,
         render: (value, row, index) => {
           let color = value === 1 ? "green" : "volcano";
           let text = value === 1 ? "Nữ" : "Nam";
@@ -228,25 +206,39 @@ const List = memo(
       {
         title: "Action",
         key: "action",
+        width: 100,
         render: (text, row) => (
-          <Space size="middle">
+          <div>
             <Tooltip placement="topLeft" title="Sửa">
-              <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(row)} />
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => onEdit(row)}
+              />
             </Tooltip>
             <Tooltip placement="topLeft" title="Xóa">
-              <Button type="link" icon={<DeleteOutlined />} />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => onDelete(row)}
+              />
             </Tooltip>
-          </Space>
+          </div>
         ),
       },
     ];
-
+    let arrConcat = _.concat(columns, arr);
     return (
-      <Table
-        columns={columns}
-        dataSource={data}
-        scroll={{ y: "calc(100vh - 450px)" }}
-        pagination={false}
+      <Cell
+        data={data}
+        arrKey={arrKey}
+        arrConcat={arrConcat}
+        params={params}
+        setParams={setParams}
+        show={show}
+        setShow={setShow}
+        visibleChild={visibleChild}
+        setVisibleChild={setVisibleChild}
       />
     );
   }

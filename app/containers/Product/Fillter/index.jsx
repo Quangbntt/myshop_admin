@@ -10,6 +10,7 @@ import { Ui } from "utils/Ui";
 import SelectMultiple from "components/SelectMultiple";
 import { useHistory, useLocation } from "react-router-dom";
 import ModalCreate from "../Modal/index";
+import ModalChild from "../ModalChild/index";
 const format = "DD/MM/YYYY";
 const { RangePicker } = DatePicker;
 
@@ -25,6 +26,8 @@ const Fillter = memo(
     data,
     dataBranch,
     setDataBranch,
+    visibleChild,
+    setVisibleChild,
   }) => {
     let history = useHistory();
     let location = useLocation();
@@ -132,6 +135,15 @@ const Fillter = memo(
         <ModalCreate
           visible={visible}
           setVisible={setVisible}
+          setRow={setRow}
+          row={row}
+          data={data}
+          dataBranch={dataBranch}
+          setDataBranch={setDataBranch}
+        />
+        <ModalChild
+          visibleChild={visibleChild}
+          setVisibleChild={setVisibleChild}
           setRow={setRow}
           row={row}
           data={data}

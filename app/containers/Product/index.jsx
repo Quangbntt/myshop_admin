@@ -16,11 +16,15 @@ let time = null;
 
 const index = memo(({}) => {
   const [loading, setLoading] = useState(false);
-  const [row, setRow] = useState("");
   const [totalLength, setTotalLength] = useState(0);
   const [data, setData] = useState([]);
   const [dataBranch, setDataBranch] = useState([]);
   const [visible, setVisible] = useState({
+    isShow: false,
+    create: false,
+    data: {},
+  });
+  const [visibleChild, setVisibleChild] = useState({
     isShow: false,
     create: false,
     data: {},
@@ -31,12 +35,17 @@ const index = memo(({}) => {
     trangThaiNT: undefined,
     product: undefined,
     category: undefined,
-    page: 1,
+    page: 0,
     size: 10,
   });
   const [show, setShow] = useState({
     showAll: false,
     arrKey: [],
+  });
+  const [row, setRow] = useState({
+    data: [],
+    arrKey: [],
+    dataOld: [],
   });
 
   const boweload = useCallback(async () => {
@@ -50,8 +59,8 @@ const index = memo(({}) => {
       arrCategory.push(itemCategory.value);
     });
     let newParams = {
-      startDate: params.startDate,
-      endDate: params.endDate,
+      // startDate: params.startDate,
+      // endDate: params.endDate,
       product: arrProduct,
       category: arrCategory,
       page: params.page,
@@ -69,13 +78,18 @@ const index = memo(({}) => {
       setLoading(false);
       setTotalLength(_.get(result, "value.total"));
       let i = 1;
-      let arrData = _.map(_.get(result, "value.data"), (item, index) => {
+      let arrData = _.map(_.get(result, "value"), (item, index) => {
         item.key = i++;
         return item;
       });
       setData(arrData);
+      let keyNew = [];
+      _.map(arrData, (dataRes, index) => {
+        keyNew.push(dataRes.key);
+      });
       await setRow((preState) => {
         let nextState = { ...preState };
+        nextState.arrKey = keyNew;
         nextState.data = arrData;
         return nextState;
       });
@@ -126,6 +140,8 @@ const index = memo(({}) => {
                     data={data}
                     dataBranch={dataBranch}
                     setDataBranch={setDataBranch}
+                    visibleChild={visibleChild}
+                    setVisibleChild={setVisibleChild}
                   />
                 }
               />
@@ -137,6 +153,8 @@ const index = memo(({}) => {
                   totalLength={totalLength}
                   visible={visible}
                   setVisible={setVisible}
+                  visibleChild={visibleChild}
+                  setVisibleChild={setVisibleChild}
                   setRow={setRow}
                   params={params}
                   row={row}
@@ -144,11 +162,11 @@ const index = memo(({}) => {
                   setShow={setShow}
                   arrKey={_.get(row, "arrKey")}
                 />
-                <Pagination
+                {/* <Pagination
                   params={params}
                   total={totalLength}
                   setParams={setParams}
-                />
+                /> */}
               </CardContent>
             </Card>
           </Spin>
