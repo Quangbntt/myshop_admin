@@ -8,6 +8,7 @@ import Account from "containers/Account/Loadable";
 import Product from "containers/Product/Loadable";
 import Category from "containers/Category/Loadable";
 import Test from "containers/Test/Loadable";
+import Branch from "containers/Branch/Loadable";
 
 import Profile from "containers/Profile/Loadable";
 import NotFoundPage from "containers/NotFoundPage/Loadable";
@@ -62,7 +63,12 @@ export const authorizedRoutes = [
     component: Product,
   },
   {
-    path: "/nhom-san-pham",
+    path: "/thuong-hieu",
+    exact: true,
+    component: Branch,
+  },
+  {
+    path: "/loai-san-pham",
     exact: true,
     component: Category,
   },

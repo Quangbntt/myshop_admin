@@ -9,9 +9,9 @@ import classNames from "classnames";
 import { Ui } from "utils/Ui";
 import ServiceBase from "utils/ServiceBase";
 import _ from "lodash";
-import Fillter from "./Fillter/index";
-import List from "./List/index";
 import Pagination from "components/Paginate/index";
+import Fillter from "./Filter/index";
+import List from "./List/index";
 let time = null;
 
 const index = memo(({}) => {
@@ -19,46 +19,32 @@ const index = memo(({}) => {
   const [row, setRow] = useState("");
   const [totalLength, setTotalLength] = useState(0);
   const [data, setData] = useState([]);
-  const [dataBranch, setDataBranch] = useState([]);
   const [visible, setVisible] = useState({
     isShow: false,
-    create: false,
+    type: "create",
     data: {},
   });
   const [params, setParams] = useState({
-    startDate: moment().startOf("month"),
-    endDate: moment().endOf("month"),
-    trangThaiNT: undefined,
-    product: undefined,
-    category: undefined,
     page: 1,
-    size: 10,
+    limit: 10,
   });
   const [show, setShow] = useState({
     showAll: false,
     arrKey: [],
   });
-
   const boweload = useCallback(async () => {
+    let arrId = [];
+    _.map(params.id, (item, key) => {
+      arrId.push(item.value);
+    });
     setLoading(true);
-    let arrProduct = [];
-    let arrCategory = [];
-    _.map(params.product, (itemName, indexName) => {
-      arrProduct.push(itemName.value);
-    });
-    _.map(params.category, (itemCategory, indexPhone) => {
-      arrCategory.push(itemCategory.value);
-    });
     let newParams = {
-      startDate: params.startDate,
-      endDate: params.endDate,
-      product: arrProduct,
-      category: arrCategory,
+      id: arrId,
       page: params.page,
-      limit: params.size,
+      size: params.limit,
     };
     let result = await ServiceBase.requestJson({
-      url: "/product/list-admin",
+      url: "/branch/list",
       method: "GET",
       data: newParams,
     });
@@ -74,33 +60,6 @@ const index = memo(({}) => {
         return item;
       });
       setData(arrData);
-      await setRow((preState) => {
-        let nextState = { ...preState };
-        nextState.data = arrData;
-        return nextState;
-      });
-      await setShow((preState) => {
-        let nextState = { ...preState };
-        nextState.showAll = false;
-        return nextState;
-      });
-    }
-    let branch = await ServiceBase.requestJson({
-      url: "/branch/list",
-      method: "GET",
-      data: {},
-    });
-    if (branch.hasErrors) {
-      Ui.showErrors(branch.errors);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      let i = 0;
-      let arrBranch = _.map(_.get(branch, "value.data"), (item, index) => {
-        item.key = i++;
-        return item;
-      });
-      setDataBranch(arrBranch);
     }
   }, [params]);
   useEffect(() => {
@@ -124,8 +83,6 @@ const index = memo(({}) => {
                     setRow={setRow}
                     row={row}
                     data={data}
-                    dataBranch={dataBranch}
-                    setDataBranch={setDataBranch}
                   />
                 }
               />
@@ -133,6 +90,7 @@ const index = memo(({}) => {
                 <List
                   data={data}
                   loading={loading}
+                  setLoading={setLoading}
                   setParams={setParams}
                   totalLength={totalLength}
                   visible={visible}

@@ -55,7 +55,6 @@ const Cell = memo(
     const onStatus = async (text, row, key) => {
       let id = row.id;
       let statuses = !row.status;
-      console.log(statuses);
       let status = 0;
       switch (statuses) {
         case true:

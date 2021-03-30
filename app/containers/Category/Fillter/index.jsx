@@ -116,7 +116,7 @@ const Fillter = memo(({ className, params, setParams, visible, setVisible, row, 
           data={data}
         /> */}
       <Row gutter={15}>
-      <Col xl={6} lg={6} md={6} xs={6}>
+      {/* <Col xl={6} lg={6} md={6} xs={6}>
           <RangePicker
             // disabledDate={disabledDate}
             value={[params.startDate, params.endDate]}
@@ -129,8 +129,8 @@ const Fillter = memo(({ className, params, setParams, visible, setVisible, row, 
             format={format}
             onChange={(dates, dateStrings) => onDate(dates, dateStrings)}
           />
-        </Col>
-        <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
+        </Col> */}
+        {/* <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
           <SelectMultiple
             url="/category/getCategoryInfor"
             placeholder="Loại sản phẩm"
@@ -140,7 +140,7 @@ const Fillter = memo(({ className, params, setParams, visible, setVisible, row, 
               getQuery(name, "name");
             }}
           />
-        </Col>
+        </Col> */}
         {/* <Col className="clearParams" xxl={2} xl={2} lg={2} md={2} sm={2}>
           <Button
               type="primary"
@@ -156,11 +156,11 @@ const Fillter = memo(({ className, params, setParams, visible, setVisible, row, 
               Thêm mới
             </Button>
         </Col> */}
-        <Col className="clearParams" xxl={2} xl={2} lg={2} md={2} sm={2}>
+        {/* <Col className="clearParams" xxl={2} xl={2} lg={2} md={2} sm={2}>
           <Button type="link" onClick={clearParams}>
             Xóa bộ lọc
           </Button>
-        </Col>
+        </Col> */}
       </Row>
     </div>
   );

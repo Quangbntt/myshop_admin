@@ -42,8 +42,8 @@ const SideBar = memo(({ className, collapsed }) => {
     },
     {
       "mod_id": 533,
-      "name": "NHÓM SẢN PHẨM",
-      "mod_folder": "/nhom-san-pham",
+      "name": "LOẠI SẢN PHẨM",
+      "mod_folder": "/loai-san-pham",
       "path": "",
       "icon": "",
       "permissions": "",

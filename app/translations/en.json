@@ -2,5 +2,6 @@
   "app.routing./signin": "Đăng nhập",
   "app.routing./tai-khoan": "Tài khoản",
   "app.routing./san-pham": "Sản phẩm",
-  "app.routing./nhom-san-pham": "Nhóm sản phẩm"
+  "app.routing./loai-san-pham": "Loại sản phẩm",
+  "app.routing./thuong-hieu": "Thương hiệu"
 }

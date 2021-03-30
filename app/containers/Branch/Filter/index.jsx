@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo, useEffect } from "react";
-import { Row, Col, DatePicker, Button, Select } from "antd";
+import { Row, Col, DatePicker, Button, Select, Input } from "antd";
 import _ from "lodash";
 import moment from "moment";
 import styled from "styled-components";
@@ -12,6 +12,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import ModalCreate from "../Modal/index";
 const format = "DD/MM/YYYY";
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const Fillter = memo(
   ({
@@ -23,8 +24,6 @@ const Fillter = memo(
     row,
     setRow,
     data,
-    dataBranch,
-    setDataBranch,
   }) => {
     let history = useHistory();
     let location = useLocation();
@@ -32,92 +31,47 @@ const Fillter = memo(
       (value, name) => {
         setParams((preState) => {
           let nextState = { ...preState };
-          nextState[name] = value;
+          nextState[`${name}`] = value;
           return nextState;
         });
       },
       [params]
     );
-    const onDate = (dates, dateStrings) => {
-      if (_.isArray(dates)) {
-        let dateTo = dates[0];
-        let dateFrom = dates[1];
-        getQuery(dateTo, "startDate");
-        getQuery(dateFrom, "endDate");
-      } else {
-        let resetTo = moment().startOf("month");
-        let resetFrom = moment().endOf("month");
-        getQuery(resetTo, "startDate");
-        getQuery(resetFrom, "endDate");
-      }
-    };
+    
     const clearParams = () => {
       setParams((preState) => {
         let nextState = { ...preState };
-        nextState.startDate = moment().startOf("month");
-        nextState.endDate = moment().endOf("month");
-        nextState.product = undefined;
-        nextState.category = undefined;
+        nextState.id = undefined;
         nextState.page = 1;
         nextState.size = 10;
         return nextState;
       });
     };
 
-    // const dateAt = moment(params.thang.format("YYYY-MM-DD"));
-
     // function xử lí phần push search lên url để copy link vẫn dc filter
     const pushQuery = useMemo(() => {
       let pathName = location.pathname;
-      let pathFullName = [];
-      let pathCategory = [];
-      let pathEndDay = "";
-      let pathStartDay = "";
-      if (params.startDate) {
-        pathStartDay = params.startDate
-          ? moment(params.startDate).format("YYYY-MM-DD")
-          : "";
-      }
-      if (params.endDate) {
-        pathEndDay = params.endDate
-          ? moment(params.endDate).format("YYYY-MM-DD")
-          : "";
-      }
-      if (_.size(params.product) > 0) {
-        pathFullName = JSON.stringify(params.product);
-      }
-      if (_.size(params.category) > 0) {
-        pathCategory = JSON.stringify(params.category);
+      let pathId = [];
+      
+      if (_.size(params.id) > 0) {
+        pathId = JSON.stringify(params.id);
       }
       history.push({
         pathname: pathName,
-        search: `?start=${pathStartDay}&end=${pathEndDay}&name=${pathFullName}&category=${pathCategory}`,
+        search: `?id=${pathId}`,
       });
     }, [params]);
     // khi mới đầu vào thì sẽ set lại dữ liệu khi url có phần search
     useEffect(() => {
       pushQuery;
       const query = new URLSearchParams(location.search);
-      const paramProduct = query.get("product");
-      const paramCategory = query.get("category");
-      const paramStartDate = query.get("start");
-      const paramEndDate = query.get("end");
+      const paramId = query.get("id");
 
       setParams((preState) => {
         let nextState = { ...preState };
-        if (paramStartDate) {
-          nextState.startDate = paramStartDate
-            ? moment(paramStartDate)
-            : moment();
-        }
-        if (paramEndDate) {
-          nextState.endDate = paramEndDate ? moment(paramEndDate) : moment();
-        }
-        if (paramProduct) {
-          nextState.product = JSON.parse(paramProduct);
-        }
-        if (paramCategory) {
-          nextState.category = JSON.parse(paramCategory);
+        
+        if (paramId) {
+          nextState.id = JSON.parse(paramId);
         }
         return nextState;
       });
@@ -135,46 +89,17 @@ const Fillter = memo(
           setRow={setRow}
           row={row}
           data={data}
-          dataBranch={dataBranch}
-          setDataBranch={setDataBranch}
+          setParams={setParams}
         />
         <Row gutter={15}>
-          <Col xl={6} lg={6} md={6} xs={6}>
-            <RangePicker
-              // disabledDate={disabledDate}
-              value={[params.startDate, params.endDate]}
-              ranges={{
-                "Hôm nay": [moment(), moment()],
-                "Cả tháng": [
-                  moment().startOf("month"),
-                  moment().endOf("month"),
-                ],
-                "Cả tuần": [moment(), moment().weekday(7)],
-                "Tuần tới": [moment().weekday(7), moment().weekday(13)],
-              }}
-              format={format}
-              onChange={(dates, dateStrings) => onDate(dates, dateStrings)}
-            />
-          </Col>
           <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
             <SelectMultiple
-              url="/product/list-name"
-              placeholder="Tên sản phẩm"
-              value={params.product}
+              url="/branch/list-name"
+              placeholder="Thương hiệu"
+              value={params.id}
               onChange={(value) => {
-                let product = value;
-                getQuery(product, "product");
-              }}
-            />
-          </Col>
-          <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
-            <SelectMultiple
-              url="/category/getCategoryInfor"
-              placeholder="Loại sản phẩm"
-              value={params.category}
-              onChange={(value) => {
-                let category = value;
-                getQuery(category, "category");
+                let id = value;
+                getQuery(id, "id");
               }}
             />
           </Col>
@@ -184,7 +109,7 @@ const Fillter = memo(
               onClick={() => {
                 setVisible((preState) => {
                   let nextState = { ...preState };
-                  nextState.create = true;
+                  nextState.type = "create";
                   nextState.isShow = true;
                   return nextState;
                 });

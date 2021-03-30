@@ -33,10 +33,25 @@ const List = memo(
     setShow,
   }) => {
     const columns = [
-        { title: 'Tên sản phẩm', dataIndex: 'name', key: 'id', width: "450px" },
-        { title: 'Hiển thị', dataIndex: '', key: 'displayorder', width: "350px" },
-        { title: 'Trạng thái', dataIndex: '', key: 'key' },
-      ];
+      {
+        title: "Tên sản phẩm",
+        dataIndex: "name",
+        key: "id",
+        width: "450px",
+        render: (text, row, key) => {
+          let proLength = row.product.length;
+          const obj = {
+            children: (
+              text + " (" + `${proLength} loại sản phẩm` + ")"
+            ),
+            props: {},
+          };
+          return obj;
+        },
+      },
+      { title: "Hiển thị", dataIndex: "", key: "displayorder", width: "350px" },
+      { title: "Trạng thái", dataIndex: "", key: "key" },
+    ];
     let arrConcat = _.concat(columns, arr);
     return (
       <Cell
