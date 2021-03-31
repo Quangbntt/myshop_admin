@@ -133,17 +133,20 @@ const ModalCreate = memo(
       }
       return e && e.fileListChild;
     };
-    let x = -1;
-    const objChild = {};
     const fileListChild = [];
-    _.map(_.get(visible, "data").product_more_image, (item, key) => {
-      for(let i = 0; i<item.length;i++) {
-        objChild.uid = -i;
-        objChild.status = "done";
-        objChild.url = item[i];
-        fileListChild.push(objChild);
-      }
-    })
+    const dataNew = _.get(visible, "data").product_more_image
+      ? _.get(visible, "data").product_more_image
+      : [];
+    let dataObj = {};
+    _.map(dataNew[0], (itemData, index) => {
+      dataObj = {
+        uid: index,
+        status: "done",
+        url: itemData
+      };
+      fileListChild.push(dataObj);
+      // return dataObj;
+    });
 
     const create = _.get(visible, "create", false);
     const type = _.get(visible, "type");
@@ -453,7 +456,9 @@ const ModalCreate = memo(
                       className="upload-list-inline"
                       listType="picture"
                       action={handleUploadChild}
-                      defaultFileList={type === "edit" ? fileListChild : ""}
+                      defaultFileList={
+                        type === "edit" ? [...fileListChild] : ""
+                      }
                     >
                       <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
                     </Upload>
@@ -464,7 +469,7 @@ const ModalCreate = memo(
           </Row>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {create === true ? "Tạo mới" : "Cập nhật"}
+              {type === "edit" ? "Cập nhật" : "Tạo mới"}
             </Button>
           </Form.Item>
         </Form>
