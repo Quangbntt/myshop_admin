@@ -19,6 +19,7 @@ const index = memo(({}) => {
   const [totalLength, setTotalLength] = useState(0);
   const [data, setData] = useState([]);
   const [dataBranch, setDataBranch] = useState([]);
+  const [dataCategory, setDataCategory] = useState([]);
   const [visible, setVisible] = useState({
     isShow: false,
     create: false,
@@ -35,6 +36,7 @@ const index = memo(({}) => {
     trangThaiNT: undefined,
     product: undefined,
     category: undefined,
+    sex: undefined,
     page: 0,
     size: 10,
   });
@@ -65,6 +67,7 @@ const index = memo(({}) => {
       category: arrCategory,
       page: params.page,
       limit: params.size,
+      sex: params.sex,
     };
     let result = await ServiceBase.requestJson({
       url: "/product/list-admin",
@@ -76,7 +79,7 @@ const index = memo(({}) => {
       setLoading(false);
     } else {
       setLoading(false);
-      setTotalLength(_.get(result, "value.total"));
+      setTotalLength(_.get(result, "value.length"));
       let i = 1;
       let arrData = _.map(_.get(result, "value"), (item, index) => {
         item.key = i++;
@@ -116,6 +119,23 @@ const index = memo(({}) => {
       });
       setDataBranch(arrBranch);
     }
+    let category = await ServiceBase.requestJson({
+      url: "/category/info",
+      method: "GET",
+      data: {},
+    });
+    if (category.hasErrors) {
+      Ui.showErrors(category.errors);
+      setLoading(false);
+    } else {
+      setLoading(false);
+      let i = 0;
+      let arrCategory = _.map(_.get(category, "value.data"), (item, index) => {
+        item.key = i++;
+        return item;
+      });
+      setDataCategory(arrCategory);
+    }
   }, [params]);
   useEffect(() => {
     clearTimeout(time);
@@ -140,8 +160,11 @@ const index = memo(({}) => {
                     data={data}
                     dataBranch={dataBranch}
                     setDataBranch={setDataBranch}
+                    dataCategory={dataCategory}
+                    setDataCategory={setDataCategory}
                     visibleChild={visibleChild}
                     setVisibleChild={setVisibleChild}
+                    setLoading={setLoading}
                   />
                 }
               />
@@ -149,6 +172,7 @@ const index = memo(({}) => {
                 <List
                   data={data}
                   loading={loading}
+                  setLoading={setLoading}
                   setParams={setParams}
                   totalLength={totalLength}
                   visible={visible}

@@ -11,16 +11,25 @@ import {
   Tooltip,
   Tag,
   Rate,
+  Modal
 } from "antd";
 import styled from "styled-components";
 import classNames from "classnames";
 import { array } from "prop-types";
-import { DownOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined
+} from "@ant-design/icons";
 import Cell from "./Cell/index";
 import moment from "moment";
+import ServiceBase from "utils/ServiceBase";
 import _ from "lodash";
 import * as style from "components/Variables";
+import { Ui } from "utils/Ui";
 const { Column, ColumnGroup } = Table;
+const { confirm } = Modal;
 const arr = [];
 
 const List = memo(
@@ -38,9 +47,9 @@ const List = memo(
     setVisible,
     visibleChild,
     setVisibleChild,
+    setLoading,
   }) => {
     const onEdit = (row) => {
-      // setRow(row);
       setVisible((preState) => {
         let nextState = { ...preState };
         nextState.isShow = true;
@@ -53,7 +62,7 @@ const List = memo(
       confirm({
         title: "Thông báo",
         icon: <ExclamationCircleOutlined />,
-        content: "Bạn có muốn xóa thương hiệu này không?",
+        content: "Bạn có muốn xóa sản phẩm này không?",
         okText: "Đồng ý",
         cancelText: "Hủy",
         onOk() {
@@ -65,14 +74,14 @@ const List = memo(
     const onDelteApi = async (row) => {
       setLoading(true);
       let result = await ServiceBase.requestJson({
-        url: `/branch/delete`,
+        url: `/product/delete`,
         method: "POST",
-        data: { branches_id: row.id },
+        data: { product_id: row.product_id },
       });
       if (result.hasErrors) {
         Ui.showErrors(result.errors);
       } else {
-        Ui.showSuccess({ message: _.get(result, "value.message") });
+        Ui.showSuccess('Xóa sản phẩm thành công');
         setParams((preState) => {
           let nextState = { ...preState };
           nextState = nextState;

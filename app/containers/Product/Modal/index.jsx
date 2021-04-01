@@ -14,7 +14,7 @@ import {
   Upload,
   InputNumber,
 } from "antd";
-import _ from "lodash";
+import _, { valuesIn } from "lodash";
 import {
   CloseOutlined,
   CheckOutlined,
@@ -27,8 +27,18 @@ import { storage } from "../../../firebase/index";
 
 const { Option } = Select;
 let time = null;
+const urlChildArr = [];
 const ModalCreate = memo(
-  ({ visible, setVisible, setRow, row, dataBranch, setDataBranch }) => {
+  ({
+    visible,
+    setVisible,
+    setRow,
+    row,
+    dataBranch,
+    setDataBranch,
+    dataCategory,
+    setLoading
+  }) => {
     const [form] = Form.useForm();
     const [status, setStatus] = useState(true);
     const handleOk = () => {
@@ -122,11 +132,13 @@ const ModalCreate = memo(
             .child(imageChild.name)
             .getDownloadURL()
             .then((url) => {
+              urlChildArr.push(url);
               setUrlImageChild(url);
             });
         }
       );
     };
+
     const normFileChild = (e: any) => {
       if (Array.isArray(e)) {
         return e;
@@ -142,26 +154,60 @@ const ModalCreate = memo(
       dataObj = {
         uid: index,
         status: "done",
-        url: itemData
+        url: itemData,
       };
       fileListChild.push(dataObj);
-      // return dataObj;
     });
 
     const create = _.get(visible, "create", false);
     const type = _.get(visible, "type");
 
     const onFinish = async (values) => {
-      let params = {
-        userName: values.userName,
-        password: values.password,
-        groupid: values.groupid,
-        name: values.name,
-        address: values.address,
-        email: values.email,
-        phone: values.phone,
-        status: status,
-      };
+      setLoading(true);
+      let params = {};
+      let arrMore = [];
+      if (type === "edit") {
+        let row = _.get(visible, "data");
+        _.map(fileListChild, (item, key) => {
+          if(item.status==="done") {
+            arrMore.push(item.url);
+          }
+        })
+        let arr_image = _.concat(arrMore, urlChildArr);
+        params = {
+          product_id: row.product_id,
+          product_code: values.product_code,
+          product_description: values.product_description,
+          product_material: values.product_material,
+          product_metatitle: values.product_metatitle,
+          product_name: values.product_name,
+          product_price: values.product_price,
+          product_promotion: values.product_promotion,
+          product_quantity: values.product_quantity,
+          product_sex: values.product_sex,
+          product_status: values.product_status,
+          product_image: urlImage ? urlImage : row.product_image,
+          product_more_image: arr_image,
+          product_category_id: values.product_category_id,
+        };
+      } else {
+        params = {
+          product_code: values.product_code,
+          product_description: values.product_description,
+          product_material: values.product_material,
+          product_metatitle: values.product_metatitle,
+          product_name: values.product_name,
+          product_price: values.product_price,
+          product_promotion: values.product_promotion,
+          product_quantity: values.product_quantity,
+          product_sex: values.product_sex,
+          product_status: values.product_status,
+          product_image: urlImage,
+          product_more_image: urlChildArr,
+          product_category_id: values.product_category_id,
+        };
+      }
+
       let url = "";
       if (create) {
         url = "/product/create";
@@ -174,13 +220,15 @@ const ModalCreate = memo(
         data: params,
       });
       if (result.hasErrors) {
+        setLoading(false);
         Ui.showErrors(result.errors);
       } else {
+        setLoading(false);
         let message = "";
         if (create) {
-          message = "Tạo Mới Ca Thành Công";
+          message = "Tạo mới sản phẩm thành công";
         } else {
-          message = "Sửa Mới Ca Thành Công";
+          message = "Cập nhật sản phẩm thành công";
         }
         Ui.showSuccess({ message: message });
         setVisible((preState) => {
@@ -209,9 +257,10 @@ const ModalCreate = memo(
           product_includedvat: product.product_includedvat,
           product_price: product.product_price,
           product_quantity: product.product_quantity,
-          product_categoryid: product.product_categoryid,
+          product_category_id: product.product_category_id,
           product_material: product.product_material,
           product_sex: product.sex,
+          product_code: product.product_code,
         };
         form.setFieldsValue(obj);
       }
@@ -222,7 +271,7 @@ const ModalCreate = memo(
 
     return (
       <Modal
-        title="Quản lý tài khoản"
+        title="Quản lý sản phẩm"
         visible={_.get(visible, "isShow")}
         onCancel={handleCancel}
         width="50%"
@@ -370,9 +419,15 @@ const ModalCreate = memo(
                       value={getFieldValue("product_sex")}
                       allowClear
                     >
-                      <Option value={1}>Nữ</Option>
-                      <Option value={2}>Nam</Option>
-                      <Option value={3}>Unisex</Option>
+                      <Option key={1} value={1}>
+                        Nữ
+                      </Option>
+                      <Option key={2} value={2}>
+                        Nam
+                      </Option>
+                      <Option key={3} value={3}>
+                        Unisex
+                      </Option>
                     </Select>
                   </Form.Item>
                 )}
@@ -391,8 +446,12 @@ const ModalCreate = memo(
                       value={getFieldValue("product_status")}
                       allowClear
                     >
-                      <Option value={1}>Hết hàng</Option>
-                      <Option value={1}>Còn hàng</Option>
+                      <Option key={0} value={0}>
+                        Hết hàng
+                      </Option>
+                      <Option key={1} value={1}>
+                        Còn hàng
+                      </Option>
                     </Select>
                   </Form.Item>
                 )}
@@ -412,14 +471,42 @@ const ModalCreate = memo(
                       allowClear
                     >
                       {_.map(dataBranch, (item, key) => {
-                        return <Option value={item.id}>{item.name}</Option>;
+                        return (
+                          <Option key={key} value={`${item.id}`}>
+                            {item.name}
+                          </Option>
+                        );
                       })}
                     </Select>
                   </Form.Item>
                 )}
               </Form.Item>
             </Col>
-            <Col md={12} />
+            <Col md={12}>
+              <Form.Item shouldUpdate={true} noStyle>
+                {({ getFieldValue }) => (
+                  <Form.Item
+                    name="product_category_id"
+                    rules={[{ required: true, message: "Vui lòng chọn" }]}
+                    label="Loại sản phẩm"
+                  >
+                    <Select
+                      placeholder="Loại sản phẩm"
+                      value={getFieldValue("product_category_id")}
+                      allowClear
+                    >
+                      {_.map(dataCategory, (item, key) => {
+                        return (
+                          <Option key={key} value={item.id}>
+                            {item.name}
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                )}
+              </Form.Item>
+            </Col>
             <Col md={12}>
               <Form.Item shouldUpdate={true} noStyle>
                 {({ getFieldValue }) => (

@@ -13,6 +13,7 @@ import ModalCreate from "../Modal/index";
 import ModalChild from "../ModalChild/index";
 const format = "DD/MM/YYYY";
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const Fillter = memo(
   ({
@@ -28,6 +29,9 @@ const Fillter = memo(
     setDataBranch,
     visibleChild,
     setVisibleChild,
+    dataCategory,
+    setDataCategory,
+    setLoading
   }) => {
     let history = useHistory();
     let location = useLocation();
@@ -61,6 +65,7 @@ const Fillter = memo(
         nextState.endDate = moment().endOf("month");
         nextState.product = undefined;
         nextState.category = undefined;
+        nextState.sex = undefined;
         nextState.page = 1;
         nextState.size = 10;
         return nextState;
@@ -74,6 +79,7 @@ const Fillter = memo(
       let pathName = location.pathname;
       let pathFullName = [];
       let pathCategory = [];
+      let pathSex = [];
       let pathEndDay = "";
       let pathStartDay = "";
       if (params.startDate) {
@@ -89,6 +95,9 @@ const Fillter = memo(
       if (_.size(params.product) > 0) {
         pathFullName = JSON.stringify(params.product);
       }
+      if (_.size(params.sex) > 0) {
+        pathSex = JSON.stringify(params.sex);
+      }
       if (_.size(params.category) > 0) {
         pathCategory = JSON.stringify(params.category);
       }
@@ -103,6 +112,7 @@ const Fillter = memo(
       const query = new URLSearchParams(location.search);
       const paramProduct = query.get("product");
       const paramCategory = query.get("category");
+      const paramSex = query.get("sex");
       const paramStartDate = query.get("start");
       const paramEndDate = query.get("end");
 
@@ -118,6 +128,9 @@ const Fillter = memo(
         }
         if (paramProduct) {
           nextState.product = JSON.parse(paramProduct);
+        }
+        if (paramSex) {
+          nextState.sex = JSON.parse(paramSex);
         }
         if (paramCategory) {
           nextState.category = JSON.parse(paramCategory);
@@ -140,6 +153,9 @@ const Fillter = memo(
           data={data}
           dataBranch={dataBranch}
           setDataBranch={setDataBranch}
+          dataCategory={dataCategory}
+          setDataCategory={setDataCategory}
+          setLoading={setLoading}
         />
         <ModalChild
           visibleChild={visibleChild}
@@ -189,6 +205,20 @@ const Fillter = memo(
                 getQuery(category, "category");
               }}
             />
+          </Col>
+          <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
+            <Select
+              defaultValue="0"
+              onChange={(value) => {
+                let sex = value;
+                getQuery(sex, "sex");
+              }}
+            >
+              <Option value="0">Tất cả</Option>
+              <Option value="1">Nữ</Option>
+              <Option value="2">Nam</Option>
+              <Option value="3">Unisex</Option>
+            </Select>
           </Col>
           <Col className="clearParams" xxl={2} xl={2} lg={2} md={2} sm={2}>
             <Button
