@@ -1,7 +1,5 @@
 import React, { memo, useState, useEffect, useCallback } from "react";
 import {
-  Spin,
-  Drawer,
   Button,
   Form,
   Input,
@@ -9,25 +7,15 @@ import {
   Modal,
   Row,
   Col,
-  TimePicker,
-  Switch,
-  Upload,
   InputNumber,
 } from "antd";
 import _ from "lodash";
 import {
-  CloseOutlined,
-  CheckOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import moment from "moment";
 import { Ui } from "utils/Ui";
 import ServiceBase from "utils/ServiceBase";
-import { storage } from "../../../firebase/index";
 
-const { Option } = Select;
-const { TextArea } = Input;
-const format = "HH:mm";
 let time = null;
 const ModalCreate = memo(
   ({
@@ -37,6 +25,7 @@ const ModalCreate = memo(
     row,
     dataBranch,
     setDataBranch,
+    setParams
   }) => {
     const [form] = Form.useForm();
     const [status, setStatus] = useState(true);
@@ -60,21 +49,19 @@ const ModalCreate = memo(
     const type = _.get(visibleChild, "type");
 
     const onFinish = async (values) => {
+      let product = _.get(visibleChild, "data");
       let params = {
-        userName: values.userName,
-        password: values.password,
-        groupid: values.groupid,
-        name: values.name,
-        address: values.address,
-        email: values.email,
-        phone: values.phone,
-        status: status,
+        id: product.id,
+        product_id: product.product_id,
+        color: values.color,
+        size_name: values.size_name,
+        product_count: values.product_count,
       };
       let url = "";
-      if (create) {
-        url = "/product/create";
+      if (type==="create") {
+        url = "/product/child-create";
       } else {
-        url = "/product/update";
+        url = "/product/child-update";
       }
       let result = await ServiceBase.requestJson({
         url: url,
@@ -85,15 +72,20 @@ const ModalCreate = memo(
         Ui.showErrors(result.errors);
       } else {
         let message = "";
-        if (create) {
-          message = "Tạo Mới Ca Thành Công";
+        if (type==="create") {
+          message = "Tạo mới sản phẩm thành công";
         } else {
-          message = "Sửa Mới Ca Thành Công";
+          message = "Cập nhật sản phẩm thành công";
         }
         Ui.showSuccess({ message: message });
         setVisibleChild((preState) => {
           let nextState = { ...preState };
           nextState.isShow = false;
+          return nextState;
+        });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
           return nextState;
         });
       }
@@ -102,6 +94,7 @@ const ModalCreate = memo(
       let product = _.get(visibleChild, "data");
       if (product) {
         let obj = {
+          product_id: product.product_id,
           color: product.color,
           size_name: product.size_name,
           product_count: product.product_count,

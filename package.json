@@ -29,7 +29,7 @@
     "build:prod-hshv": "cross-env NODE_ENV=production NODE_CONFIG=hshv webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
     "build:prod-hv": "cross-env NODE_ENV=production NODE_CONFIG=hv webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
     "build:clean": "rimraf ./build",
-    "start": "SET PORT=3000 && cross-env NODE_ENV=development NODE_CONFIG=vungtau node server",
+    "start": "SET PORT=3003 && cross-env NODE_ENV=development NODE_CONFIG=vungtau node server",
     "start:tunnel": "cross-env NODE_ENV=development ENABLE_TUNNEL=true node server",
     "start:production": "npm run test && npm run build && npm run start:prod",
     "start:prod": "cross-env NODE_ENV=production node server",

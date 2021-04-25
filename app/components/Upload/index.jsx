@@ -11,14 +11,14 @@ import { API_BASE_URL } from "../../utils/constants";
 let uid = 1;
 
 const UploadList = ({}) => {
-    const [arrData,setArrData] = useState({
-        arrayImgURL:[]
-    })
+  const [arrData, setArrData] = useState({
+    arrayImgURL: [],
+  });
   const URL = () => {
     return `${API_BASE_URL}upload/multi/files`;
   };
   const customRequest = async (option) => {
-      console.log('option.file',option.file)
+    console.log("option.file", option.file);
     const data = new FormData();
     data.set("files", option.file);
     let result = await ServiceBase.requestJson({
@@ -46,9 +46,9 @@ const UploadList = ({}) => {
         return newState;
       });
       notification.warning({
-          message: 'Có lỗi trong quá trình upload',
-          // description:
-          //     'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+        message: "Có lỗi trong quá trình upload",
+        // description:
+        //     'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
       });
     }
   };
@@ -70,7 +70,7 @@ const UploadList = ({}) => {
     <Upload
       // onDownload={this.onDownload}
       // fileList={arrayImgURL}
-        onRemove={(e) => onRemove(e)}
+      onRemove={(e) => onRemove(e)}
       // disabled={this.props.form.getFieldValue("upload") ? true : false}
       name="file"
       action={URL}

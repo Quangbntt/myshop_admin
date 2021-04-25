@@ -17,7 +17,7 @@ import styled from "styled-components";
 import classNames from "classnames";
 import { array } from "prop-types";
 import {
-  DownOutlined,
+  PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined
@@ -58,6 +58,15 @@ const List = memo(
         return nextState;
       });
     };
+    const onCreate = (row) => {
+      setVisibleChild((preState) => {
+        let nextState = { ...preState };
+        nextState.isShow = true;
+        nextState.type = "create";
+        nextState.data = row;
+        return nextState;
+      });
+    }
     const onDelete = (row) => {
       confirm({
         title: "Thông báo",
@@ -218,6 +227,13 @@ const List = memo(
         width: 100,
         render: (text, row) => (
           <div>
+            <Tooltip placement="topLeft" title="Thêm mới">
+              <Button
+                type="link"
+                icon={<PlusOutlined />}
+                onClick={() => onCreate(row)}
+              />
+            </Tooltip>
             <Tooltip placement="topLeft" title="Sửa">
               <Button
                 type="link"
@@ -248,6 +264,7 @@ const List = memo(
         setShow={setShow}
         visibleChild={visibleChild}
         setVisibleChild={setVisibleChild}
+        setLoading={setLoading}
       />
     );
   }

@@ -23,6 +23,8 @@ import {
 import moment from "moment";
 import { Ui } from "utils/Ui";
 import ServiceBase from "utils/ServiceBase";
+import { storage } from "../../../firebase/index";
+
 const { Option } = Select;
 const { TextArea } = Input;
 const format = "HH:mm";
@@ -47,12 +49,102 @@ const ModalCreate = memo(
         return nextState;
       });
     };
-    const normFile = (e: any) => {
+
+    //Upload image to firebase
+    const [image, setImage] = useState(null);
+    const [urlImage, setUrlImage] = useState("");
+
+    const handleChange = (e) => {
+      if (e.target.files[0]) {
+        setImage(e.target.files[0]);
+      }
+    };
+
+    const handleUpload = () => {
+      const uploadTask = storage.ref(`images/${image.name}`).put(image);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          storage
+            .ref("images")
+            .child(image.name)
+            .getDownloadURL()
+            .then((url) => {
+              setUrlImage(url);
+            });
+        }
+      );
+    };
+    const normFile = (e) => {
       if (Array.isArray(e)) {
         return e;
       }
       return e && e.fileList;
     };
+    const fileList = [
+      {
+        uid: "-1",
+        status: "done",
+        url: _.get(visible, "data").user_image,
+      },
+    ];
+
+    //Upload background to firebase
+    const [imageBackground, setImageBackground] = useState(null);
+    const [urlImageBackground, setUrlImageBackground] = useState("");
+
+    const handleChangeBackground = (e) => {
+      if (e.target.files[0]) {
+        setImageBackground(e.target.files[0]);
+      }
+    };
+
+    const handleUploadBackground = () => {
+      const uploadTask = storage.ref(`images/${imageBackground.name}`).put(imageBackground);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          storage
+            .ref("images")
+            .child(imageBackground.name)
+            .getDownloadURL()
+            .then((url) => {
+              setUrlImageBackground(url);
+            });
+        }
+      );
+    };
+    const normFileBackground = (e) => {
+      if (Array.isArray(e)) {
+        return e;
+      }
+      return e && e.fileListBackground;
+    };
+    const fileListBackground = [
+      {
+        uid: "-1",
+        status: "done",
+        url: _.get(visible, "data").background_image,
+      },
+    ];
+
+
     const create = _.get(visible, "create", false);
     const type = _.get(visible, "type");
 
@@ -67,6 +159,8 @@ const ModalCreate = memo(
         address: _.get(values, "address"),
         email: _.get(values, "email"),
         phone: _.get(values, "phone"),
+        user_image: urlImage ? urlImage : row.user_image,
+        background_image: urlImageBackground ? urlImageBackground : row.background_image,
         status: status === false ? 0 : 1,
       };
       let url = "";
@@ -103,10 +197,24 @@ const ModalCreate = memo(
       }
     };
     const boweload = useCallback(async () => {
-      if (type === "edit") {
-        form.setFieldsValue(_.get(visible, "data"));
+      let user = _.get(visible, "data");
+      if (user) {
+        let obj = {
+          username: user.username,
+          password: user.password,
+          groupid: user.groupid,
+          name: user.name,
+          address: user.address,
+          email: user.email,
+          phone: user.phone,
+          status: user.status,
+          user_image: user.user_image,
+          backgound_image: user.backgound_image,
+          birthday: user.birthday,
+        };
+        form.setFieldsValue(obj);
       }
-    }, []);
+    }, [visible]);
     useEffect(() => {
       setTimeout(boweload, 0);
     }, [boweload]);
@@ -263,22 +371,50 @@ const ModalCreate = memo(
                 )}
               </Form.Item>
             </Col>
-            {/* <Col md={12}>
-            <Form.Item shouldUpdate={true} noStyle>
-              {({ getFieldValue }) => (
-                <Form.Item
-                  name="upload"
-                  label="Ảnh đại diện"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                >
-                  <Upload name="logo" action="/upload.do" listType="picture">
-                    <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
-                  </Upload>
-                </Form.Item>
-              )}
-            </Form.Item>
-          </Col> */}
+            <Col md={12}>
+              <Form.Item shouldUpdate={true} noStyle>
+                {({ getFieldValue }) => (
+                  <Form.Item
+                    name="urlImage"
+                    label="Ảnh đại diện"
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                    onChange={handleChange}
+                  >
+                    <Upload
+                      className="upload-list-inline"
+                      listType="picture"
+                      action={handleUpload}
+                      defaultFileList={type === "edit" ? fileList : ""}
+                    >
+                      <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
+                  </Form.Item>
+                )}
+              </Form.Item>
+            </Col>
+            <Col md={12}>
+              <Form.Item shouldUpdate={true} noStyle>
+                {({ getFieldValue }) => (
+                  <Form.Item
+                    name="urlBackground"
+                    label="Ảnh nền"
+                    valuePropName="fileListBackground"
+                    getValueFromEvent={normFileBackground}
+                    onChange={handleChangeBackground}
+                  >
+                    <Upload
+                      className="upload-list-inline"
+                      listType="picture"
+                      action={handleUploadBackground}
+                      defaultFileList={type === "edit" ? fileListBackground : ""}
+                    >
+                      <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
+                  </Form.Item>
+                )}
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item>
             <Button type="primary" htmlType="submit">

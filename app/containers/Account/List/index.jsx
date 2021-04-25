@@ -11,7 +11,7 @@ import {
   Tag,
   Tooltip,
   Switch,
-  Modal
+  Modal,
 } from "antd";
 import styled from "styled-components";
 import classNames from "classnames";
@@ -21,7 +21,7 @@ import {
   DeleteOutlined,
   CloseOutlined,
   CheckOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import _ from "lodash";
@@ -29,8 +29,7 @@ import * as style from "components/Variables";
 import ServiceBase from "utils/ServiceBase";
 import { Ui } from "utils/Ui";
 import ModalCreate from "../Modal/index";
-const { Column, ColumnGroup } = Table;
-const arr = [];
+import ModalUser from "../ModalUser/index";
 const { confirm } = Modal;
 
 const List = memo(
@@ -46,14 +45,9 @@ const List = memo(
     setShow,
     setVisible,
     visible,
-    setLoading
+    setLoading,
   }) => {
-    // const dataMonth = params.thang
-    //   ? moment(params.thang, "YYYY-MM").daysInMonth()
-    //   : "";
-    // const dayOfMonth = params.thang.format("D");
     const onEdit = (row) => {
-      // setRow(row);
       setVisible((preState) => {
         let nextState = { ...preState };
         nextState.isShow = true;
@@ -62,6 +56,15 @@ const List = memo(
         return nextState;
       });
     };
+    const onShow = (row) => {
+      setVisible((preState) => {
+        let nextState = { ...preState };
+        nextState.isShowModal = true;
+        nextState.type = "edit";
+        nextState.data = row;
+        return nextState;
+      });
+    }
     const onDelete = (row) => {
       confirm({
         title: "Thông báo",
@@ -72,7 +75,7 @@ const List = memo(
         onOk() {
           onDelteApi(row);
         },
-        onCancel() { },
+        onCancel() {},
       });
     };
     const onDelteApi = async (row) => {
@@ -112,7 +115,7 @@ const List = memo(
         method: "GET",
         data: {
           id: id,
-          status: status
+          status: status,
         },
       });
       if (result.hasErrors) {
@@ -127,11 +130,11 @@ const List = memo(
       }
     };
     const onActive = (text, row, key) => {
-      let name = ''
+      let name = "";
       if (row.status == 1) {
-        name = 'Bạn muốn bỏ active tài khoản này không?'
+        name = "Bạn muốn bỏ active tài khoản này không?";
       } else {
-        name = 'Bạn muốn active tài khoản này không?'
+        name = "Bạn muốn active tài khoản này không?";
       }
       confirm({
         title: `Thông báo`,
@@ -142,57 +145,64 @@ const List = memo(
         onOk() {
           onStatus(text, row, key);
         },
-        onCancel() { },
+        onCancel() {},
       });
     };
     const columns = [
       {
-        title: 'STT',
-        dataIndex: 'key',
-        key: 'key',
+        title: "STT",
+        dataIndex: "key",
+        key: "key",
         width: 60,
       },
       {
-        title: 'Tên đăng nhập',
-        dataIndex: 'username',
-        key: 'username',
+        title: "Tên đăng nhập",
+        dataIndex: "username",
+        key: "username",
         width: 140,
-        render: text => <a>{text}</a>,
+
+        render: (value, row, index) => {
+          const obj = {
+            children: <a onClick={() => onShow(row)}>{value}</a>,
+            props: {},
+          };
+          return obj;
+        },
       },
       {
-        title: 'Chức vụ',
-        dataIndex: 'roles_name',
-        key: 'roles_id',
+        title: "Chức vụ",
+        dataIndex: "roles_name",
+        key: "roles_id",
         width: 140,
       },
       {
-        title: 'Họ tên',
-        dataIndex: 'name',
-        key: 'name',
+        title: "Họ tên",
+        dataIndex: "name",
+        key: "name",
         width: 180,
       },
       {
-        title: 'Địa chỉ',
-        key: 'address',
-        dataIndex: 'address',
+        title: "Địa chỉ",
+        key: "address",
+        dataIndex: "address",
         width: 100,
       },
       {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
         width: 180,
       },
       {
-        title: 'Điện thoại',
-        dataIndex: 'phone',
-        key: 'phone',
+        title: "Điện thoại",
+        dataIndex: "phone",
+        key: "phone",
         width: 120,
       },
       {
-        title: 'Trạng thái',
-        dataIndex: 'address',
-        key: 'address',
+        title: "Trạng thái",
+        dataIndex: "address",
+        key: "address",
         width: 120,
         render: (text, row, key) => (
           <Switch
@@ -202,11 +212,11 @@ const List = memo(
             onChange={(e) => onActive(text, row, key)}
             checked={row.status}
           />
-        )
+        ),
       },
       {
-        title: 'Action',
-        key: 'action',
+        title: "Action",
+        key: "action",
         width: 100,
         render: (text, row) => (
           <Space size="middle">
@@ -243,6 +253,13 @@ const List = memo(
             setRow={setRow}
             row={row}
             data={data}
+          />
+        )}
+        {visible.isShowModal && (
+          <ModalUser
+            visible={visible}
+            setVisible={setVisible}
+            setParams={setParams}
           />
         )}
         <Table

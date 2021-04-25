@@ -29,6 +29,7 @@ import classNames from "classnames";
 import ServiceBase from "utils/ServiceBase";
 import { Ui } from "utils/Ui";
 import moment from "moment";
+import ModalChild from "../../ModalChild/index";
 
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 
@@ -47,6 +48,7 @@ const Cell = memo(
     setShow,
     visibleChild,
     setVisibleChild,
+    setLoading
   }) => {
     let width = screen.width * 0.4;
     let cloneArrKey = _.cloneDeep(arrKey);
@@ -85,7 +87,6 @@ const Cell = memo(
     };
 
     const onEdit = (row) => {
-      // setRow(row);
       setVisibleChild((preState) => {
         let nextState = { ...preState };
         nextState.isShow = true;
@@ -95,10 +96,11 @@ const Cell = memo(
       });
     };
     const onDelete = (row) => {
+      console.log(row);
       confirm({
         title: "Thông báo",
         icon: <ExclamationCircleOutlined />,
-        content: "Bạn có muốn xóa thương hiệu này không?",
+        content: "Bạn có muốn xóa sản phẩm này không?",
         okText: "Đồng ý",
         cancelText: "Hủy",
         onOk() {
@@ -110,9 +112,9 @@ const Cell = memo(
     const onDelteApi = async (row) => {
       setLoading(true);
       let result = await ServiceBase.requestJson({
-        url: `/branch/delete`,
+        url: `/product/child-delete`,
         method: "POST",
-        data: { branches_id: row.id },
+        data: { id: row.id },
       });
       if (result.hasErrors) {
         Ui.showErrors(result.errors);
@@ -217,6 +219,16 @@ const Cell = memo(
           [className]: true,
         })}
       >
+        <ModalChild
+          visibleChild={visibleChild}
+          setVisibleChild={setVisibleChild}
+          setParams={setParams}
+          // setRow={setRow}
+          // row={row}
+          // data={data}
+          // dataBranch={dataBranch}
+          // setDataBranch={setDataBranch}
+        />
         <div className="customerIcon">
           <Button type="link">
             {show.showAll === false ? (

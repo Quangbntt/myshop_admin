@@ -21,6 +21,7 @@ const index = memo(({}) => {
   const [data, setData] = useState([]);
   const [visible, setVisible] = useState({
     isShow: false,
+    isShowModal: false,
     type: "create",
     data: {},
   });

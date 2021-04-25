@@ -37,7 +37,7 @@ const ModalCreate = memo(
     dataBranch,
     setDataBranch,
     dataCategory,
-    setLoading
+    setParams
   }) => {
     const [form] = Form.useForm();
     const [status, setStatus] = useState(true);
@@ -163,7 +163,6 @@ const ModalCreate = memo(
     const type = _.get(visible, "type");
 
     const onFinish = async (values) => {
-      setLoading(true);
       let params = {};
       let arrMore = [];
       if (type === "edit") {
@@ -220,10 +219,8 @@ const ModalCreate = memo(
         data: params,
       });
       if (result.hasErrors) {
-        setLoading(false);
         Ui.showErrors(result.errors);
       } else {
-        setLoading(false);
         let message = "";
         if (create) {
           message = "Tạo mới sản phẩm thành công";
@@ -234,6 +231,11 @@ const ModalCreate = memo(
         setVisible((preState) => {
           let nextState = { ...preState };
           nextState.isShow = false;
+          return nextState;
+        });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
           return nextState;
         });
       }
