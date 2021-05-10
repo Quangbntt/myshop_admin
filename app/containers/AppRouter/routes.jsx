@@ -9,6 +9,10 @@ import Product from "containers/Product/Loadable";
 import Category from "containers/Category/Loadable";
 import Test from "containers/Test/Loadable";
 import Branch from "containers/Branch/Loadable";
+import Order from "containers/Order/Loadable";
+import New from "containers/New/Loadable";
+import Promotion from "containers/Promotion/Loadable";
+import Report from "containers/Report/Loadable";
 
 import Profile from "containers/Profile/Loadable";
 import NotFoundPage from "containers/NotFoundPage/Loadable";
@@ -63,6 +67,21 @@ export const authorizedRoutes = [
     component: Product,
   },
   {
+    path: "/khuyen-mai",
+    exact: true,
+    component: Promotion,
+  },
+  {
+    path: "/tin-tuc",
+    exact: true,
+    component: New,
+  },
+  {
+    path: "/don-hang",
+    exact: true,
+    component: Order,
+  },
+  {
     path: "/thuong-hieu",
     exact: true,
     component: Branch,
@@ -71,6 +90,11 @@ export const authorizedRoutes = [
     path: "/loai-san-pham",
     exact: true,
     component: Category,
+  },
+  {
+    path: "/thong-ke",
+    exact: true,
+    component: Report,
   },
   {
     path: "/",

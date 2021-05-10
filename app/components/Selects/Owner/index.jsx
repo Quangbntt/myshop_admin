@@ -4,7 +4,6 @@ import { TreeSelect, Spin } from 'antd';
 import _ from 'lodash';
 import ServiceBase from 'utils/ServiceBase';
 import { Ui } from 'utils/Ui';
-import { withStyles } from '@material-ui/core/es/styles';
 
 let timer = null;
 const Owner = ({
@@ -153,19 +152,5 @@ Owner.propTypes = {
   value: PropTypes.any,
 };
 export default memo(
-  withStyles({
-    treeSelect: {
-      // "& .ant-select-tree li:only-child": {
-      //   display: "grid",
-      //   gridTemplateColumns: "20px auto",
-      //   "& ul": {
-      //     gridColumn: "1 / 2"
-      //   }
-      // }
-      '& .anticon': {
-        fontSize: '15px !important',
-        verticalAlign: 0,
-      },
-    },
-  })(Owner),
+  Owner,
 );

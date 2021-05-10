@@ -57,7 +57,6 @@ const SignIn = ({ className, isAuthenticated, setAuthenticated }) => {
         Ui.showErrors(result.errors);
         setIsFetching(false);
       } else {
-        console.log(('quang'));
         Ui.showSuccess({ message: "Đăng nhập hệ thống thành công." });
         let profile = _.get(result, "value", {});
         profile = {

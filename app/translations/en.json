@@ -3,5 +3,8 @@
   "app.routing./tai-khoan": "Tài khoản",
   "app.routing./san-pham": "Sản phẩm",
   "app.routing./loai-san-pham": "Loại sản phẩm",
-  "app.routing./thuong-hieu": "Thương hiệu"
+  "app.routing./thuong-hieu": "Thương hiệu",
+  "app.routing./khuyen-mai": "Khuyến mại",
+  "app.routing./don-hang": "Đơn hàng",
+  "app.routing./tin-tuc": "Tin tức"
 }

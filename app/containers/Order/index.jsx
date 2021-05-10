@@ -9,8 +9,9 @@ import classNames from "classnames";
 import { Ui } from "utils/Ui";
 import ServiceBase from "utils/ServiceBase";
 import _ from "lodash";
-import Fillter from "./Fillter/index";
+import Fillter from "./Filter/index";
 import List from "./List/index";
+import Pagination from "components/Paginate/index";
 let time = null;
 
 const index = memo(({}) => {
@@ -23,14 +24,14 @@ const index = memo(({}) => {
   const [totalLength, setTotalLength] = useState(0);
   const [data, setData] = useState([]);
   const [visible, setVisible] = useState({
-    isShow :false,
-    create:false
+    isShow: false,
+    create: false,
   });
   const [params, setParams] = useState({
     startDate: moment().startOf("month"),
     endDate: moment().endOf("month"),
-    name: undefined,
-    page: 0,
+    product: undefined,
+    page: 1,
     size: 10,
   });
   const [show, setShow] = useState({
@@ -40,48 +41,43 @@ const index = memo(({}) => {
   const [grid, setGrid] = useState({
     startDate: params.startDate.format("YYYY-MM-DD"),
     endDate: params.endDate.format("YYYY-MM-DD"),
-    name: params.name,
+    product: params.product,
     page: params.page,
     limit: params.size,
   });
   const boweload = useCallback(async () => {
     setLoading(true);
-    let arrName = [];
-    _.map(params.name, (itemName, indexName) => {
-      arrName.push(itemName.key);
+    let arrProduct = [];
+    _.map(params.product, (itemName, indexName) => {
+        arrProduct.push(itemName.key);
     });
+    
     let newParams = {
-      startDate: params.startDate,
-      endDate: params.endDate,
-      name: arrName,
+      startDate: params.startDate.format("YYYY-MM-DD"),
+      endDate: params.endDate.format("YYYY-MM-DD"),
+      product_id: arrProduct,
       page: params.page,
       limit: params.size,
     };
     let result = await ServiceBase.requestJson({
-      url: "/category/all",
+      url: "/order/get-admin-order",
       method: "GET",
       data: newParams,
-      // data: "",
     });
     if (result.hasErrors) {
       Ui.showErrors(result.errors);
       setLoading(false);
     } else {
       setLoading(false);
-      setTotalLength(_.get(result, "value.length"));
+      setTotalLength(_.get(result, "value.total"));
       let i = 1;
-      let arrData = _.map(_.get(result, "value"), (item, index) => {
+      let arrData = _.map(_.get(result, "value.data"), (item, index) => {
         item.key = i++;
         return item;
-      });
-      let keyNew = [];
-      _.map(arrData, (dataRes, index) => {
-        keyNew.push(dataRes.key);
       });
       setData(arrData);
       await setRow((preState) => {
         let nextState = { ...preState };
-        nextState.arrKey = keyNew;
         nextState.data = arrData;
         return nextState;
       });
@@ -131,6 +127,11 @@ const index = memo(({}) => {
                   show={show}
                   setShow={setShow}
                   arrKey={_.get(row, "arrKey")}
+                />
+                <Pagination
+                  params={params}
+                  total={totalLength}
+                  setParams={setParams}
                 />
               </CardContent>
             </Card>

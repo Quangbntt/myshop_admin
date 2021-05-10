@@ -50,6 +50,15 @@ const SideBar = memo(({ className, collapsed }) => {
       "children": []
     },
     {
+      "mod_id": 534,
+      "name": "KHUYẾN MẠI",
+      "mod_folder": "/khuyen-mai",
+      "path": "",
+      "icon": "",
+      "permissions": "",
+      "children": []
+    },
+    {
       "mod_id": 535,
       "name": "THƯƠNG HIỆU",
       "mod_folder": "/thuong-hieu",
@@ -59,9 +68,27 @@ const SideBar = memo(({ className, collapsed }) => {
       "children": []
     },
     {
+      "mod_id": 536,
+      "name": "TIN TỨC",
+      "mod_folder": "/tin-tuc",
+      "path": "",
+      "icon": "",
+      "permissions": "",
+      "children": []
+    },
+    {
       "mod_id": 553,
       "name": "ĐƠN HÀNG",
       "mod_folder": "/don-hang",
+      "path": "",
+      "icon": "",
+      "permissions": "",
+      "children": []
+    },
+    {
+      "mod_id": 555,
+      "name": "THỐNG KÊ",
+      "mod_folder": "/thong-ke",
       "path": "",
       "icon": "",
       "permissions": "",

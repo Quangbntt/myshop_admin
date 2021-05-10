@@ -9,87 +9,56 @@ import classNames from "classnames";
 import { Ui } from "utils/Ui";
 import ServiceBase from "utils/ServiceBase";
 import _ from "lodash";
+import Pagination from "components/Paginate/index";
 import Fillter from "./Fillter/index";
 import List from "./List/index";
 let time = null;
 
 const index = memo(({}) => {
   const [loading, setLoading] = useState(false);
-  const [row, setRow] = useState({
-    data: [],
-    arrKey: [],
-    dataOld: [],
-  });
+  const [row, setRow] = useState("");
   const [totalLength, setTotalLength] = useState(0);
   const [data, setData] = useState([]);
   const [visible, setVisible] = useState({
-    isShow :false,
-    create:false
+    isShow: false,
+    type: "create",
+    data: {},
   });
   const [params, setParams] = useState({
     startDate: moment().startOf("month"),
     endDate: moment().endOf("month"),
-    name: undefined,
-    page: 0,
-    size: 10,
+    page: 1,
+    limit: 10,
   });
   const [show, setShow] = useState({
     showAll: false,
     arrKey: [],
   });
-  const [grid, setGrid] = useState({
-    startDate: params.startDate.format("YYYY-MM-DD"),
-    endDate: params.endDate.format("YYYY-MM-DD"),
-    name: params.name,
-    page: params.page,
-    limit: params.size,
-  });
   const boweload = useCallback(async () => {
     setLoading(true);
-    let arrName = [];
-    _.map(params.name, (itemName, indexName) => {
-      arrName.push(itemName.key);
-    });
     let newParams = {
-      startDate: params.startDate,
-      endDate: params.endDate,
-      name: arrName,
+      startDate: params.startDate.format("YYYY-MM-DD"),
+      endDate: params.endDate.format("YYYY-MM-DD"),
       page: params.page,
-      limit: params.size,
+      size: params.limit,
     };
     let result = await ServiceBase.requestJson({
-      url: "/category/all",
+      url: "/news/all",
       method: "GET",
       data: newParams,
-      // data: "",
     });
     if (result.hasErrors) {
       Ui.showErrors(result.errors);
       setLoading(false);
     } else {
       setLoading(false);
-      setTotalLength(_.get(result, "value.length"));
+      setTotalLength(_.get(result, "value.total"));
       let i = 1;
-      let arrData = _.map(_.get(result, "value"), (item, index) => {
+      let arrData = _.map(_.get(result, "value.data"), (item, index) => {
         item.key = i++;
         return item;
       });
-      let keyNew = [];
-      _.map(arrData, (dataRes, index) => {
-        keyNew.push(dataRes.key);
-      });
       setData(arrData);
-      await setRow((preState) => {
-        let nextState = { ...preState };
-        nextState.arrKey = keyNew;
-        nextState.data = arrData;
-        return nextState;
-      });
-      await setShow((preState) => {
-        let nextState = { ...preState };
-        nextState.showAll = false;
-        return nextState;
-      });
     }
   }, [params]);
   useEffect(() => {
@@ -120,7 +89,6 @@ const index = memo(({}) => {
                 <List
                   data={data}
                   loading={loading}
-                  grid={grid}
                   setParams={setParams}
                   totalLength={totalLength}
                   visible={visible}
@@ -131,6 +99,11 @@ const index = memo(({}) => {
                   show={show}
                   setShow={setShow}
                   arrKey={_.get(row, "arrKey")}
+                />
+                <Pagination
+                  params={params}
+                  total={totalLength}
+                  setParams={setParams}
                 />
               </CardContent>
             </Card>

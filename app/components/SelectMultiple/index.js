@@ -45,8 +45,13 @@ const SelectMultiple = ({
     if (result.hasErrors) {
       Ui.showErrors(result.errors);
     } else {
-      if (url === "/dieudo/dsnottuyen") {
-        console.log('url',url)
+      if (url === "/product/list-name-filter") {
+        newData = _.map([{id: 0, name: "Tất cả"}].concat(_.get(result, "value.data", [])), (x) => ({
+          key: x.id,
+          id: x.didId,
+          label: x.name,
+        }));
+      } else if (url === "/dieudo/dsnottuyen") {
         newData = _.map(_.get(result, "value.data", []), (x) => ({
           key: x.id,
           id: x.didId,
@@ -81,7 +86,7 @@ const SelectMultiple = ({
       labelInValue={labelInValue}
       defaultActiveFirstOption={false}
       filterOption={(input, option) =>
-        option.chinldre.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
       placeholder={placeholder}
       notFoundContent={fetching ? <Spin size="small" /> : "Không có dữ liệu"}

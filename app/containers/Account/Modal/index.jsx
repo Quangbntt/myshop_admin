@@ -134,6 +134,7 @@ const ModalCreate = memo(
       if (Array.isArray(e)) {
         return e;
       }
+      console.log(e);
       return e && e.fileListBackground;
     };
     const fileListBackground = [
@@ -393,7 +394,7 @@ const ModalCreate = memo(
                 )}
               </Form.Item>
             </Col>
-            <Col md={12}>
+            {/* <Col md={12}>
               <Form.Item shouldUpdate={true} noStyle>
                 {({ getFieldValue }) => (
                   <Form.Item
@@ -414,7 +415,7 @@ const ModalCreate = memo(
                   </Form.Item>
                 )}
               </Form.Item>
-            </Col>
+            </Col> */}
           </Row>
           <Form.Item>
             <Button type="primary" htmlType="submit">

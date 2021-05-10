@@ -4,5 +4,5 @@
  *
  */
 export const URI = {
-  SIGN_IN: '/login',
+  SIGN_IN: '/login-admin',
 };

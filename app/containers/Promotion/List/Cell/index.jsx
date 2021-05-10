@@ -12,7 +12,6 @@ import {
   Divider,
   Switch,
   Modal,
-  Tooltip,
 } from "antd";
 import _ from "lodash";
 import {
@@ -21,15 +20,12 @@ import {
   CloseOutlined,
   CheckOutlined,
   ExclamationCircleOutlined,
-  EditOutlined,
-  DeleteOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import classNames from "classnames";
 import ServiceBase from "utils/ServiceBase";
 import { Ui } from "utils/Ui";
 import moment from "moment";
-import ModalChild from "../../ModalChild/index";
 
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 
@@ -44,11 +40,10 @@ const Cell = memo(
     arrConcat,
     params,
     setParams,
+    dataMonth,
+    dayOfMonth,
     show,
     setShow,
-    visibleChild,
-    setVisibleChild,
-    setLoading
   }) => {
     let width = screen.width * 0.4;
     let cloneArrKey = _.cloneDeep(arrKey);
@@ -64,7 +59,39 @@ const Cell = memo(
         return nextState;
       });
     };
-
+    const onStatus = async (text, row, key) => {
+      let id = row.id;
+      let statuses = !row.status;
+      let status = 0;
+      switch (statuses) {
+        case true:
+          status = 1;
+          break;
+        case false:
+          status = 0;
+          break;
+        default:
+          break;
+      }
+      let result = await ServiceBase.requestJson({
+        url: "/category/changeStatus",
+        method: "GET",
+        data: {
+          id: id,
+          status: status,
+        },
+      });
+      if (result.hasErrors) {
+        Ui.showErrors(result.errors);
+      } else {
+        Ui.showSuccess({ message: _.get(result, "value.message") });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
+          return nextState;
+        });
+      }
+    };
     const onChangeShow = (rows, record) => {
       let arrKeyNew = show.arrKey;
       let key = record.key;
@@ -85,80 +112,68 @@ const Cell = memo(
         return nextState;
       });
     };
-
-    const onEdit = (row) => {
-      setVisibleChild((preState) => {
-        let nextState = { ...preState };
-        nextState.isShow = true;
-        nextState.type = "edit";
-        nextState.data = row;
-        return nextState;
-      });
-    };
-    const onDelete = (row) => {
+    const onActive = (text, row, key) => {
+      let name = "";
+      if (row.status == 1) {
+        name = "Bạn muốn bỏ active dòng sản phẩm này không?";
+      } else {
+        name = "Bạn muốn active dòng sản phẩm này không?";
+      }
       confirm({
-        title: "Thông báo",
+        title: `Thông báo`,
         icon: <ExclamationCircleOutlined />,
-        content: "Bạn có muốn xóa sản phẩm này không?",
-        okText: "Đồng ý",
-        cancelText: "Hủy",
+        content: `${name}`,
+        okText: "Có",
+        cancelText: "Không",
         onOk() {
-          onDelteApi(row);
+          onStatus(text, row, key);
         },
         onCancel() {},
       });
-    };
-    const onDelteApi = async (row) => {
-      setLoading(true);
-      let result = await ServiceBase.requestJson({
-        url: `/product/child-delete`,
-        method: "POST",
-        data: { id: row.id },
-      });
-      if (result.hasErrors) {
-        Ui.showErrors(result.errors);
-      } else {
-        Ui.showSuccess({ message: _.get(result, "value.message") });
-        setParams((preState) => {
-          let nextState = { ...preState };
-          nextState = nextState;
-          return nextState;
-        });
-      }
     };
 
     const expandedRowRender = (item, index) => {
       const columns = [
         {
           title: "Mã sản phẩm",
-          dataIndex: "id",
+          dataIndex: "product_id",
+          key: "product_id",
+        },
+        {
+          title: "Tên sản phẩm",
           key: "id",
-          width: 120,
+          render: (value, row, key) => {
+            console.log(row);
+            const obj = {
+              children: row.promotion_product.product_name,
+              props: {},
+            };
+            return obj;
+          },
         },
         {
-          title: "Màu sắc",
-          dataIndex: "color",
-          key: "color",
-          width: 120,
+          title: "Hình ảnh",
+          key: "promotion_id",
+          render: (value, row, key) => {
+            console.log(row);
+            const obj = {
+              children: (
+                <img
+                  src={row.promotion_product.product_image}
+                  width="50"
+                  height="50"
+                />
+              ),
+              props: {},
+            };
+            return obj;
+          },
         },
         {
-          title: "Kích cỡ",
-          dataIndex: "size_name",
-          key: "size_name",
-          width: 120,
-        },
-        {
-          title: "Số lượng",
-          dataIndex: "product_count",
-          key: "product_count",
-          width: 120,
-        },
-        {
-          title: "Ngày nhập",
+          title: "Ngày tạo",
           dataIndex: "created_at",
           key: "created_at",
-          width: 120,
-          render: (value, row, index) => {
+          render: (value, row, key) => {
             const obj = {
               children: moment(value).format("DD-MM-YYYY"),
               props: {},
@@ -166,32 +181,9 @@ const Cell = memo(
             return obj;
           },
         },
-        {
-          title: "Action",
-          key: "action",
-          width: 100,
-          render: (text, row) => (
-            <div>
-              <Tooltip placement="topLeft" title="Sửa">
-                <Button
-                  type="link"
-                  icon={<EditOutlined />}
-                  onClick={() => onEdit(row)}
-                />
-              </Tooltip>
-              <Tooltip placement="topLeft" title="Xóa">
-                <Button
-                  type="link"
-                  icon={<DeleteOutlined />}
-                  onClick={() => onDelete(row)}
-                />
-              </Tooltip>
-            </div>
-          ),
-        },
       ];
       const dataChild = [];
-      _.map(item.product, (dataItem, key) => {
+      _.map(item.promotion_detail, (dataItem, key) => {
         dataChild.push(dataItem);
       });
       return (
@@ -199,6 +191,7 @@ const Cell = memo(
           columns={columns}
           dataSource={dataChild}
           pagination={false}
+          key={index}
           showHeader={true}
           className="table_small"
           bordered
@@ -218,16 +211,6 @@ const Cell = memo(
           [className]: true,
         })}
       >
-        <ModalChild
-          visibleChild={visibleChild}
-          setVisibleChild={setVisibleChild}
-          setParams={setParams}
-          // setRow={setRow}
-          // row={row}
-          // data={data}
-          // dataBranch={dataBranch}
-          // setDataBranch={setDataBranch}
-        />
         <div className="customerIcon">
           <Button type="link">
             {show.showAll === false ? (
@@ -243,6 +226,7 @@ const Cell = memo(
           columns={arrConcat}
           expandable={{
             expandedRowRender,
+            rowExpandable: (record) => record.sanPham !== "Tổng",
           }}
           expandRowByClick={true}
           onExpand={(rows, record) => onChangeShow(rows, record)}
@@ -277,9 +261,5 @@ export default styled(Cell)`
   }
   .customButton svg {
     font-size: large;
-  }
-  th.ant-table-cell {
-    background: rgb(102 76 137);
-    color: #fff;
   }
 `;

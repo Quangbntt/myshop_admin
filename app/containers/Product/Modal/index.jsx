@@ -26,7 +26,6 @@ import ServiceBase from "utils/ServiceBase";
 import { storage } from "../../../firebase/index";
 
 const { Option } = Select;
-let time = null;
 const urlChildArr = [];
 const ModalCreate = memo(
   ({
@@ -90,7 +89,7 @@ const ModalCreate = memo(
         }
       );
     };
-    const normFile = (e: any) => {
+    const normFile = (e) => {
       if (Array.isArray(e)) {
         return e;
       }
@@ -139,7 +138,7 @@ const ModalCreate = memo(
       );
     };
 
-    const normFileChild = (e: any) => {
+    const normFileChild = (e) => {
       if (Array.isArray(e)) {
         return e;
       }

@@ -52,6 +52,7 @@ const Cell = memo(
         return nextState;
       });
     };
+    
     const onStatus = async (text, row, key) => {
       let id = row.id;
       let statuses = !row.status;

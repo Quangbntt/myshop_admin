@@ -79,6 +79,7 @@ export default class ServiceBase {
               document.body.appendChild(link);
               link.click();
             })
+            
             .catch((error) => {
               console.error(error);
             });

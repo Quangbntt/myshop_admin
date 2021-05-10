@@ -55,15 +55,15 @@ const TopMenu = memo(
     });
     const urlRoutes = urlName.slice(0, 3);
     let urlRouter = "";
-    if (urlRoutes == "/tc") {
-      urlRouter = "Tài chính";
-    } else if (urlRoutes == "/vh") {
-      urlRouter = "Vận hành";
-    } else if (urlRoutes == "/kb") {
-      urlRouter = "Khai báo";
-    }  else if (urlRoutes == "/kh") {
-      urlRouter = "Khách hàng";
-    }
+    // if (urlRoutes == "/tc") {
+    //   urlRouter = "Tài chính";
+    // } else if (urlRoutes == "/vh") {
+    //   urlRouter = "Vận hành";
+    // } else if (urlRoutes == "/kb") {
+    //   urlRouter = "Khai báo";
+    // }  else if (urlRoutes == "/kh") {
+    //   urlRouter = "Khách hàng";
+    // }
     const proFile = $Cookies.get("ERP_REPORT")
       ? JSON.parse($Cookies.get("ERP_REPORT"))
       : {};
