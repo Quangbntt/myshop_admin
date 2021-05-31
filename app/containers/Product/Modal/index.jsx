@@ -137,7 +137,6 @@ const ModalCreate = memo(
         }
       );
     };
-
     const normFileChild = (e) => {
       if (Array.isArray(e)) {
         return e;

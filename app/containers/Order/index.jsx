@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect, useCallback } from "react";
 import { Spin, Select } from "antd";
 import moment from "moment";
-import { Grid, Paper, Card, CardHeader, CardContent } from "@material-ui/core";
+import { Grid, Card, CardHeader, CardContent } from "@material-ui/core";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import * as style from "components/Variables";
@@ -49,9 +49,9 @@ const index = memo(({}) => {
     setLoading(true);
     let arrProduct = [];
     _.map(params.product, (itemName, indexName) => {
-        arrProduct.push(itemName.key);
+      arrProduct.push(itemName.key);
     });
-    
+
     let newParams = {
       startDate: params.startDate.format("YYYY-MM-DD"),
       endDate: params.endDate.format("YYYY-MM-DD"),
@@ -95,48 +95,46 @@ const index = memo(({}) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Paper>
-          <Spin spinning={loading} tip="Đang lấy dữ liệu...">
-            <Card>
-              <CardHeader
-                className="cardHeader"
-                title={
-                  <Fillter
-                    params={params}
-                    setParams={setParams}
-                    visible={visible}
-                    setVisible={setVisible}
-                    setRow={setRow}
-                    row={row}
-                    data={data}
-                  />
-                }
-              />
-              <CardContent>
-                <List
-                  data={data}
-                  loading={loading}
-                  grid={grid}
+        <Spin spinning={loading} tip="Đang lấy dữ liệu...">
+          <Card>
+            <CardHeader
+              className="cardHeader"
+              title={
+                <Fillter
+                  params={params}
                   setParams={setParams}
-                  totalLength={totalLength}
                   visible={visible}
                   setVisible={setVisible}
                   setRow={setRow}
-                  params={params}
                   row={row}
-                  show={show}
-                  setShow={setShow}
-                  arrKey={_.get(row, "arrKey")}
+                  data={data}
                 />
-                <Pagination
-                  params={params}
-                  total={totalLength}
-                  setParams={setParams}
-                />
-              </CardContent>
-            </Card>
-          </Spin>
-        </Paper>
+              }
+            />
+            <CardContent>
+              <List
+                data={data}
+                loading={loading}
+                grid={grid}
+                setParams={setParams}
+                totalLength={totalLength}
+                visible={visible}
+                setVisible={setVisible}
+                setRow={setRow}
+                params={params}
+                row={row}
+                show={show}
+                setShow={setShow}
+                arrKey={_.get(row, "arrKey")}
+              />
+              <Pagination
+                params={params}
+                total={totalLength}
+                setParams={setParams}
+              />
+            </CardContent>
+          </Card>
+        </Spin>
       </Grid>
     </Grid>
   );

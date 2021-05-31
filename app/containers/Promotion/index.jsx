@@ -80,47 +80,44 @@ const index = memo(({}) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Paper>
-          <Spin spinning={loading} tip="Đang lấy dữ liệu...">
-            <Card>
-              <CardHeader
-                className="cardHeader"
-                title={
-                  <Fillter
-                    params={params}
-                    setParams={setParams}
-                    visible={visible}
-                    setVisible={setVisible}
-                    setRow={setRow}
-                    row={row}
-                    data={data}
-                  />
-                }
-              />
-              <CardContent>
-                <List
-                  data={data}
-                  loading={loading}
+        <Spin spinning={loading} tip="Đang lấy dữ liệu...">
+          <Card>
+            <CardHeader
+              title={
+                <Fillter
+                  params={params}
                   setParams={setParams}
-                  totalLength={totalLength}
                   visible={visible}
                   setVisible={setVisible}
                   setRow={setRow}
-                  params={params}
                   row={row}
-                  show={show}
-                  setShow={setShow}
-                  arrKey={_.get(row, "arrKey")}
+                  data={data}
                 />
-                <Pagination
-                  params={params}
-                  total={totalLength}
-                  setParams={setParams}
-                />
-              </CardContent>
-            </Card>
-          </Spin>
-        </Paper>
+              }
+            />
+            <CardContent>
+              <List
+                data={data}
+                loading={loading}
+                setParams={setParams}
+                totalLength={totalLength}
+                visible={visible}
+                setVisible={setVisible}
+                setRow={setRow}
+                params={params}
+                row={row}
+                show={show}
+                setShow={setShow}
+                arrKey={_.get(row, "arrKey")}
+              />
+              {/* <Pagination
+                params={params}
+                total={totalLength}
+                setParams={setParams}
+              /> */}
+            </CardContent>
+          </Card>
+        </Spin>
       </Grid>
     </Grid>
   );

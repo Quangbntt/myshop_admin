@@ -47,6 +47,40 @@ const List = memo(
     visible,
     setLoading,
   }) => {
+    const onSuccess = async (row) => {
+      let result = await ServiceBase.requestJson({
+        url: `/order/update-status`,
+        method: "POST",
+        data: { orders_id: row.orders_id, orders_status: 4 },
+      });
+      if (result.hasErrors) {
+        Ui.showErrors(result.errors);
+      } else {
+        Ui.showSuccess({ message: _.get(result, "value.message") });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
+          return nextState;
+        });
+      }
+    };
+    const onCancel = async (row) => {
+      let result = await ServiceBase.requestJson({
+        url: `/order/update-status`,
+        method: "POST",
+        data: { orders_id: row.orders_id, orders_status: 3 },
+      });
+      if (result.hasErrors) {
+        Ui.showErrors(result.errors);
+      } else {
+        Ui.showSuccess({ message: _.get(result, "value.message") });
+        setParams((preState) => {
+          let nextState = { ...preState };
+          nextState = nextState;
+          return nextState;
+        });
+      }
+    };
     const columns = [
       {
         title: "STT",
@@ -60,12 +94,17 @@ const List = memo(
         key: "name",
         width: 140,
         render: (value, row, index) => {
-            const obj = {
-              children: <><p>{value}</p><p>{row.phone}</p></>,
-              props: {},
-            };
-            return obj;
-          },
+          const obj = {
+            children: (
+              <>
+                <p>{value}</p>
+                <p>{row.phone}</p>
+              </>
+            ),
+            props: {},
+          };
+          return obj;
+        },
       },
       {
         title: "Địa chỉ",
@@ -124,6 +163,39 @@ const List = memo(
         width: 100,
       },
       {
+        title: "Trạng thái",
+        dataIndex: "orders_status",
+        key: "orders_status",
+        width: 100,
+        render: (value, row, index) => {
+          if (value == 1) {
+            const obj = {
+              children: <p>Chờ xác nhận</p>,
+              props: {},
+            };
+            return obj;
+          } else if (value == 2) {
+            const obj = {
+              children: <p>Đã nhận</p>,
+              props: {},
+            };
+            return obj;
+          } else if (value == 3) {
+            const obj = {
+              children: <p>Đã hủy</p>,
+              props: {},
+            };
+            return obj;
+          } else {
+            const obj = {
+              children: <p>Đang giao</p>,
+              props: {},
+            };
+            return obj;
+          }
+        },
+      },
+      {
         title: "Ngày mua",
         dataIndex: "created_at",
         key: "created_at",
@@ -135,7 +207,38 @@ const List = memo(
           };
           return obj;
         },
-      }
+      },
+      {
+        title: "Action",
+        dataIndex: "orders_status",
+        key: "orders_status",
+        fixed: "right",
+        width: 120,
+        render: (value, row, index) => {
+          const obj = {
+            children: value === 1 && (
+              <>
+                <Tooltip placement="topLeft" title="Hủy đơn hàng">
+                  <button
+                    className="btn"
+                    style={{ marginRight: "10px" }}
+                    onClick={() => onCancel(row)}
+                  >
+                    <CloseOutlined />
+                  </button>
+                </Tooltip>
+                <Tooltip placement="topLeft" title="Xác nhận gửi hàng">
+                  <button className="btn" onClick={() => onSuccess(row)}>
+                    <CheckOutlined />
+                  </button>
+                </Tooltip>
+              </>
+            ),
+            props: {},
+          };
+          return obj;
+        },
+      },
     ];
     return (
       <div

@@ -226,7 +226,6 @@ const Cell = memo(
           columns={arrConcat}
           expandable={{
             expandedRowRender,
-            rowExpandable: (record) => record.sanPham !== "Tổng",
           }}
           expandRowByClick={true}
           onExpand={(rows, record) => onChangeShow(rows, record)}
